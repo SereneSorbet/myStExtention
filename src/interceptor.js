@@ -72,28 +72,18 @@ export function initInterceptor(sessionId, onRecord) {
                ?? '';
     if (auth.startsWith('Bearer ')) cacheApiKey(auth.slice(7));
 
-    try {
-      const model = _extractModel(options);
-      const ct = response.headers.get('content-type') ?? '';
-
-      if (ct.includes('text/event-stream')) {
-        const [forST, forUs] = response.body.tee();
-        _consumeStream(forUs, model, sessionId, onRecord);
-        return new Response(forST, { status: response.status, statusText: response.statusText, headers: response.headers });
-      } else {
-        const clone = response.clone();
-        clone.json().then(data => {
-          if (data.usage) {
-            const record = buildRecord(data.usage, model, sessionId);
-            saveRecord(record);
-            onRecord(record);
-          }
-        }).catch(() => {});
-        return response;
+    const model = _extractModel(options);
+    response.clone().text().then(text => {
+      const usage = extractUsageFromChunks(text) ?? (() => {
+        try { return JSON.parse(text)?.usage ?? null; } catch { return null; }
+      })();
+      if (usage) {
+        const record = buildRecord(usage, model, sessionId);
+        saveRecord(record);
+        onRecord(record);
       }
-    } catch {
-      return response;
-    }
+    }).catch(() => {});
+    return response;
   };
 }
 
