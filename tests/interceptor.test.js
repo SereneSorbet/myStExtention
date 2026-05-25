@@ -1,4 +1,4 @@
-import { isDeepSeekChatUrl, extractUsageFromChunks, buildRecord } from '../src/interceptor.js';
+import { isDeepSeekChatUrl, extractUsageFromChunks, buildRecord, injectUsageOption } from '../src/interceptor.js';
 
 describe('isDeepSeekChatUrl', () => {
   test('matches deepseek chat completions URL', () => {
@@ -37,6 +37,31 @@ describe('extractUsageFromChunks', () => {
   });
   test('skips chunks where usage is null', () => {
     expect(extractUsageFromChunks('data: {"usage":null}\n')).toBeNull();
+  });
+});
+
+describe('injectUsageOption', () => {
+  test('adds stream_options.include_usage to streaming request', () => {
+    const opts = { body: JSON.stringify({ model: 'deepseek-chat', stream: true }) };
+    const result = injectUsageOption(opts);
+    expect(JSON.parse(result.body).stream_options.include_usage).toBe(true);
+  });
+  test('does not modify non-streaming request', () => {
+    const opts = { body: JSON.stringify({ model: 'deepseek-chat', stream: false }) };
+    const result = injectUsageOption(opts);
+    expect(result).toBe(opts);
+  });
+  test('adds include_usage when stream field is absent', () => {
+    const opts = { body: JSON.stringify({ model: 'deepseek-chat' }) };
+    const result = injectUsageOption(opts);
+    expect(JSON.parse(result.body).stream_options.include_usage).toBe(true);
+  });
+  test('preserves existing stream_options fields', () => {
+    const opts = { body: JSON.stringify({ stream: true, stream_options: { other: 1 } }) };
+    const result = injectUsageOption(opts);
+    const body = JSON.parse(result.body);
+    expect(body.stream_options.include_usage).toBe(true);
+    expect(body.stream_options.other).toBe(1);
   });
 });
 

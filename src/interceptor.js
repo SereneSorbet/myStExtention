@@ -47,13 +47,24 @@ export function getCachedApiKey() {
   return _cachedApiKey;
 }
 
+export function injectUsageOption(options) {
+  try {
+    const body = JSON.parse(options?.body ?? '{}');
+    if (body.stream !== false) {
+      body.stream_options = { ...(body.stream_options ?? {}), include_usage: true };
+      return { ...options, body: JSON.stringify(body) };
+    }
+  } catch {}
+  return options;
+}
+
 export function initInterceptor(sessionId, onRecord) {
   const originalFetch = window.fetch.bind(window);
 
   window.fetch = async function (url, options = {}) {
-    const response = await originalFetch(url, options);
+    if (!isDeepSeekChatUrl(url)) return originalFetch(url, options);
 
-    if (!isDeepSeekChatUrl(url)) return response;
+    const response = await originalFetch(url, injectUsageOption(options));
 
     // Cache API key from Authorization header for balance queries
     const auth = options?.headers?.['Authorization']
