@@ -1,8 +1,9 @@
 import { getRecentRecords, getBalance, saveApiKey, getApiKey } from '../storage.js';
 import { formatBalance } from '../balance.js';
+import { USD_TO_CNY } from '../cost.js';
 
 const PANEL_ID = 'ds-tracker-panel';
-const VERSION = 'v1.2.0';
+const VERSION = 'v1.3.0';
 
 export function initPanel() {
   if (document.getElementById(PANEL_ID)) return;
@@ -20,6 +21,10 @@ export function initPanel() {
       <span id="ds-bal-val">—</span>
       <button id="ds-bal-btn">刷新</button>
     </div>
+    <div class="ds-key-row">
+      <input id="ds-key-inp" type="password" placeholder="DeepSeek API Key（查余额用）" />
+      <button id="ds-key-btn">保存</button>
+    </div>
     <div class="ds-tabs">
       <button class="ds-tab active" data-d="1">今天</button>
       <button class="ds-tab" data-d="7">7天</button>
@@ -32,10 +37,6 @@ export function initPanel() {
     </div>
     <div class="ds-rec-hdr">最近请求</div>
     <div id="ds-p-list" class="ds-rec-list"></div>
-    <div class="ds-key-row">
-      <input id="ds-key-inp" type="password" placeholder="DeepSeek API Key（查余额用）" />
-      <button id="ds-key-btn">保存</button>
-    </div>
   `;
   document.body.appendChild(el);
 
@@ -62,7 +63,12 @@ export function initPanel() {
 
   document.getElementById('ds-key-btn').addEventListener('click', () => {
     const val = document.getElementById('ds-key-inp').value.trim();
-    if (val) { saveApiKey(val); document.getElementById('ds-key-inp').value = ''; }
+    if (val) {
+      saveApiKey(val);
+      document.getElementById('ds-key-inp').value = '';
+      document.getElementById('ds-key-inp').placeholder = 'API Key 已保存';
+      window.dispatchEvent(new CustomEvent('ds-balance-refresh-requested'));
+    }
   });
 
   const storedKey = getApiKey();
@@ -92,7 +98,7 @@ function _summary(records) {
 
   document.getElementById('ds-p-tok').textContent   = t.tokens.toLocaleString();
   document.getElementById('ds-p-cache').textContent = cacheRate;
-  document.getElementById('ds-p-cost').textContent  = '$' + t.cost.toFixed(4);
+  document.getElementById('ds-p-cost').textContent  = '¥' + (t.cost * USD_TO_CNY).toFixed(3);
 }
 
 function _list(records) {
@@ -108,7 +114,7 @@ function _list(records) {
       <span class="ds-rt">${time}</span>
       <span>↑${_fmt(r.input_tokens)} ↓${_fmt(r.output_tokens)}</span>
       <span>命中${hitPct}</span>
-      <span>$${r.cost_usd.toFixed(4)}</span>
+      <span>¥${(r.cost_usd * USD_TO_CNY).toFixed(3)}</span>
     </div>`;
   }).join('');
 }

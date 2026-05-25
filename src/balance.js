@@ -17,8 +17,15 @@ export function formatBalance(info) {
   return `${symbol}${info.amount}`;
 }
 
+function _getKeyFromST() {
+  // Try SillyTavern globals where the API key might be stored
+  return window.oai_settings?.api_key_openai
+      || window.secret_state?.openai
+      || null;
+}
+
 export async function fetchBalance() {
-  const key = getCachedApiKey() ?? getApiKey();
+  const key = getCachedApiKey() ?? getApiKey() ?? _getKeyFromST();
   if (!key) return;
   try {
     const resp = await fetch(BALANCE_URL, { headers: { Authorization: `Bearer ${key}` } });

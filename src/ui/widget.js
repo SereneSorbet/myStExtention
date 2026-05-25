@@ -1,3 +1,5 @@
+import { USD_TO_CNY } from '../cost.js';
+
 const WIDGET_ID = 'ds-tracker-widget';
 
 const SESSION = { input: 0, output: 0, cacheHit: 0, cacheMiss: 0, costUsd: 0 };
@@ -12,8 +14,8 @@ export function initWidget() {
     <span class="ds-stat">↑<span id="ds-w-in">0</span></span>
     <span class="ds-stat">↓<span id="ds-w-out">0</span></span>
     <span class="ds-stat">命中<span id="ds-w-cache">—</span></span>
-    <span class="ds-stat">$<span id="ds-w-cost">0.0000</span></span>
-    <button id="ds-panel-btn" title="查看详细统计">📊</button>
+    <span class="ds-stat">¥<span id="ds-w-cost">0.000</span></span>
+    <button id="ds-panel-btn" title="查看详细统计"><span class="ds-icon">◈</span></button>
   `;
 
   const anchor = document.getElementById('send_form') ?? document.getElementById('form_sheld');
@@ -37,7 +39,7 @@ export function updateWidget(record) {
   _set('ds-w-in',    _fmt(SESSION.input));
   _set('ds-w-out',   _fmt(SESSION.output));
   _set('ds-w-cache', cacheRate);
-  _set('ds-w-cost',  SESSION.costUsd.toFixed(4));
+  _set('ds-w-cost',  (SESSION.costUsd * USD_TO_CNY).toFixed(3));
 }
 
 function _set(id, text) {

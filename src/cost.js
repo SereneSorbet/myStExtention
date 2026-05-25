@@ -1,3 +1,5 @@
+export const USD_TO_CNY = 7.2;
+
 // Prices in USD per token. Update when DeepSeek changes their published rates.
 // V4 prices reflect the current 75% launch discount.
 export const PRICING = {
