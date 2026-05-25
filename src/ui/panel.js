@@ -2,6 +2,7 @@ import { getRecentRecords, getBalance, saveApiKey, getApiKey } from '../storage.
 import { formatBalance } from '../balance.js';
 
 const PANEL_ID = 'ds-tracker-panel';
+const VERSION = 'v1.2.0';
 
 export function initPanel() {
   if (document.getElementById(PANEL_ID)) return;
@@ -11,7 +12,7 @@ export function initPanel() {
   el.className = 'ds-panel ds-hidden';
   el.innerHTML = `
     <div class="ds-ph">
-      <span>DeepSeek 用量追踪</span>
+      <span>DeepSeek 用量追踪 <small style="opacity:0.5;font-size:0.8em">${VERSION}</small></span>
       <button id="ds-pc">×</button>
     </div>
     <div class="ds-bal-row">
