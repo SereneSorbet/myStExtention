@@ -1,1 +1,16 @@
-/* populated in Tasks 6 and 7 */
+#ds-tracker-widget {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  font-size: 0.78em;
+  color: var(--SmartThemeBodyColor, #ccc);
+  border-top: 1px solid var(--SmartThemeBorderColor, #444);
+  flex-wrap: wrap;
+}
+#ds-tracker-widget .ds-label { opacity: 0.6; }
+#ds-tracker-widget .ds-stat  { white-space: nowrap; }
+#ds-panel-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 1.1em; margin-left: auto;
+}
