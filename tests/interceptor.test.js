@@ -13,6 +13,12 @@ describe('isDeepSeekChatUrl', () => {
   test('handles invalid URL without throwing', () => {
     expect(isDeepSeekChatUrl('not-a-url')).toBe(false);
   });
+  test('matches SillyTavern local backend endpoint', () => {
+    expect(isDeepSeekChatUrl('/api/backends/chat-completions/generate')).toBe(true);
+  });
+  test('does not match other local paths', () => {
+    expect(isDeepSeekChatUrl('/api/backends/other-endpoint')).toBe(false);
+  });
 });
 
 describe('extractUsageFromChunks', () => {

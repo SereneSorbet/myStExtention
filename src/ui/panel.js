@@ -1,4 +1,4 @@
-import { getRecentRecords, getBalance } from '../storage.js';
+import { getRecentRecords, getBalance, saveApiKey, getApiKey } from '../storage.js';
 import { formatBalance } from '../balance.js';
 
 const PANEL_ID = 'ds-tracker-panel';
@@ -31,6 +31,10 @@ export function initPanel() {
     </div>
     <div class="ds-rec-hdr">最近请求</div>
     <div id="ds-p-list" class="ds-rec-list"></div>
+    <div class="ds-key-row">
+      <input id="ds-key-inp" type="password" placeholder="DeepSeek API Key（查余额用）" />
+      <button id="ds-key-btn">保存</button>
+    </div>
   `;
   document.body.appendChild(el);
 
@@ -54,6 +58,14 @@ export function initPanel() {
   window.addEventListener('ds-balance-updated', e => {
     document.getElementById('ds-bal-val').textContent = formatBalance(e.detail);
   });
+
+  document.getElementById('ds-key-btn').addEventListener('click', () => {
+    const val = document.getElementById('ds-key-inp').value.trim();
+    if (val) { saveApiKey(val); document.getElementById('ds-key-inp').value = ''; }
+  });
+
+  const storedKey = getApiKey();
+  if (storedKey) document.getElementById('ds-key-inp').placeholder = 'API Key 已保存';
 
   const cached = getBalance();
   if (cached) document.getElementById('ds-bal-val').textContent = formatBalance(cached);

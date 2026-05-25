@@ -2,6 +2,7 @@ const KEYS = {
   RECENT:  'ds_tracker_recent',
   DAILY:   'ds_tracker_daily',
   BALANCE: 'ds_tracker_balance',
+  API_KEY: 'ds_tracker_api_key',
 };
 const RETENTION_DAYS = 30;
 
@@ -36,6 +37,14 @@ export function saveBalance(info) {
 export function getBalance() {
   try { return JSON.parse(localStorage.getItem(KEYS.BALANCE) ?? 'null'); }
   catch { return null; }
+}
+
+export function saveApiKey(key) {
+  localStorage.setItem(KEYS.API_KEY, key);
+}
+
+export function getApiKey() {
+  return localStorage.getItem(KEYS.API_KEY) ?? null;
 }
 
 export function clearAll() {

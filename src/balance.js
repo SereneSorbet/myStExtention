@@ -1,4 +1,4 @@
-import { saveBalance } from './storage.js';
+import { saveBalance, getApiKey } from './storage.js';
 import { getCachedApiKey } from './interceptor.js';
 
 const BALANCE_URL = 'https://api.deepseek.com/user/balance';
@@ -18,7 +18,7 @@ export function formatBalance(info) {
 }
 
 export async function fetchBalance() {
-  const key = getCachedApiKey();
+  const key = getCachedApiKey() ?? getApiKey();
   if (!key) return;
   try {
     const resp = await fetch(BALANCE_URL, { headers: { Authorization: `Bearer ${key}` } });

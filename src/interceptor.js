@@ -2,8 +2,10 @@ import { calculateCost } from './cost.js';
 import { saveRecord } from './storage.js';
 
 export function isDeepSeekChatUrl(url) {
+  const s = typeof url === 'string' ? url : (url?.url ?? '');
+  if (s.includes('/api/backends/chat-completions/generate')) return true;
   try {
-    const u = new URL(url);
+    const u = new URL(s);
     return u.hostname.includes('deepseek.com') && u.pathname.includes('/chat/completions');
   } catch { return false; }
 }
